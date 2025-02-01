@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./App.css";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,6 +15,16 @@ import {
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarProvider,
+  SidebarTrigger,
+} from "./components/ui/sidebar";
 
 const ToggleThemeMenu = () => {
   const { setTheme } = useTheme();
@@ -43,26 +52,47 @@ const ToggleThemeMenu = () => {
   );
 };
 
+export const AppSidebar = () => {
+  return (
+    <Sidebar>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>Test</SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+};
+
 function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-col gap-2">
-        <CardTitle> vite + react + tailwind + shadcn</CardTitle>
-        <ToggleThemeMenu />
-      </CardHeader>
+    <SidebarProvider>
+      <AppSidebar />
+      <main>
+        <SidebarTrigger />
+        <Card>
+          <CardHeader className="flex flex-col gap-2">
+            <CardTitle> vite + react + tailwind + shadcn</CardTitle>
+            <ToggleThemeMenu />
+          </CardHeader>
 
-      <CardContent className="flex flex-col gap-2">
-        <Button onClick={() => setCount((count) => count + 1)}>
-          Count is {count}
-        </Button>
-      </CardContent>
+          <CardContent className="flex flex-col gap-2">
+            <Button onClick={() => setCount((count) => count + 1)}>
+              Count is {count}
+            </Button>
+          </CardContent>
 
-      <CardFooter className="flex justify-center">
-        Made with love by Filip.
-      </CardFooter>
-    </Card>
+          <CardFooter className="flex justify-center">
+            Made with love by Filip.
+          </CardFooter>
+        </Card>
+      </main>
+    </SidebarProvider>
   );
 }
 
