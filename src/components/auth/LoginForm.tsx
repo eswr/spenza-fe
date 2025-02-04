@@ -1,3 +1,4 @@
+// LoginForm.tsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,18 +16,11 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export const LoginForm: React.FC = () => {
-  const auth = useAuth();
-  if (!auth) {
-    console.error('Auth context is undefined');
-    return null;
-  }
   const { login, authError, isLoading } = useAuth();
-  // const navigate = useNavigate();
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    // setError,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -35,6 +29,7 @@ export const LoginForm: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data);
+      navigate('/');
     } catch (error) {
       console.error('Login failed:', error);
     }
@@ -49,33 +44,24 @@ export const LoginForm: React.FC = () => {
             {authError}
           </div>
         )}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+        >
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-card-foreground">
               Email
             </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              {...register('email')}
-              // className='text-input'
-              className="mt-1 block w-full p-3 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+            <Input id="email" type="email" {...register('email')} className="mt-1 block w-full p-3 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+
             />
             {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-sm font-medium text-card-foreground">
               Password
             </label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              {...register('password')}
-              // className='text-input'
-              className="mt-1 block w-full p-3 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
-            />
+            <Input id="password" type="password" {...register('password')} className="mt-1 block w-full p-3 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground" />
             {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>

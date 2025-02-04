@@ -2,13 +2,14 @@ import { useContext, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from '../context/AuthContext';
-import { api } from '@/lib/api';
 import { Credentials, User } from '@/context/types';
+import axios from 'axios';
 
 interface TokenPayload {
   email: string;
   // Include other properties from your JWT payload if necessary
 }
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -20,11 +21,10 @@ export const useAuth = () => {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: Credentials) => {
-      const response = await api.post('/auth/login', credentials);
+      const response = await axios.post(API_URL + '/auth/login', credentials);
       return response.data;
     },
     onSuccess: (data: { token: string }) => {
-      debugger
       localStorage.setItem('token', data.token);
       try {
         const decoded = jwtDecode<TokenPayload>(data.token);
@@ -36,7 +36,6 @@ export const useAuth = () => {
       }
     },
     onError: (error: any) => {
-      debugger
       if (error.response && error.response.status === 401) {
         setAuthError('Invalid email or password.');
       } else {
@@ -47,10 +46,13 @@ export const useAuth = () => {
 
   const signupMutation = useMutation({
     mutationFn: async (credentials: Credentials) => {
-      const response = await api.post('/auth/signup', credentials);
+      const response = await axios.post(API_URL + '/auth/signup', credentials);
       return response.data;
     },
     onSuccess: () => {
+      // debugger;
+      // navigate('/');
+
       // Optionally, handle post-signup actions here
     },
     onError: (error: any) => {

@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
+import { useNavigate } from 'react-router-dom';
 
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -18,6 +19,7 @@ const signupSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>;
 
 export const SignupForm: React.FC = () => {
+  const navigate = useNavigate();
   const auth = useAuth();
   if (!auth) {
     return <div>Error: Auth context is not available</div>;
@@ -34,9 +36,9 @@ export const SignupForm: React.FC = () => {
   const onSubmit = async (data: SignupFormData) => {
     try {
       await signup(data);
-      // Redirect to dashboard or desired page
+      // debugger;
+      navigate('/');
     } catch (error) {
-      // Handle signup error
     }
   };
 
