@@ -1,99 +1,27 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./components/ui/card";
-import { useTheme } from "./components/theme-provider";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./components/ui/dropdown-menu";
-import { Moon, Sun } from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarProvider,
-  SidebarTrigger,
-} from "./components/ui/sidebar";
+import { Routes, Route, Navigate } from 'react-router-dom';
+import AppLayout from './AppLayout';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
+import { useAuth } from '@/hooks/use-auth';
 
-const ToggleThemeMenu = () => {
-  const { setTheme } = useTheme();
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="w-full" asChild>
-        <Button variant="outline" size="icon">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[14rem]" align="start">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-export const AppSidebar = () => {
-  return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>Test</SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
-  );
-};
-
-function App() {
-  const [count, setCount] = useState(0);
+export default function App() {
+  const { user } = useAuth();
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main>
-        <SidebarTrigger />
-        <Card>
-          <CardHeader className="flex flex-col gap-2">
-            <CardTitle> vite + react + tailwind + shadcn</CardTitle>
-            <ToggleThemeMenu />
-          </CardHeader>
-
-          <CardContent className="flex flex-col gap-2">
-            <Button onClick={() => setCount((count) => count + 1)}>
-              Count is {count}
-            </Button>
-          </CardContent>
-
-          <CardFooter className="flex justify-center">
-            Made with love by Filip.
-          </CardFooter>
-        </Card>
-      </main>
-    </SidebarProvider>
+    <Routes>
+      <Route path="/" element={<AppLayout />}>
+        <Route
+          index
+          element={user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
+        />
+        <Route path="login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+        <Route path="signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="dashboard" element={<Dashboard />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }
-
-export default App;
