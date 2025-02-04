@@ -1,5 +1,3 @@
-// "use client";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -14,16 +12,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import axios from "axios";
+import { API_URL } from "@/lib/constants";
 
 const formSchema = z.object({
   targetUrl: z.string().url({ message: "Invalid URL" }),
   eventType: z.string().min(1, "Event type is required"),
 });
 
+type WebhookFormData = z.infer<typeof formSchema>;
+
 export function WebhookForm() {
   const queryClient = useQueryClient();
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<WebhookFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       targetUrl: "",
@@ -32,8 +33,21 @@ export function WebhookForm() {
   });
 
   const mutation = useMutation({
-    mutationFn: (values: z.infer<typeof formSchema>) =>
-      api.post("/subscriptions", values),
+    mutationFn: async (values: WebhookFormData) => {
+      // Retrieve the token from localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
+      // Set up the headers with the Authorization token
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+
+      // Make the API request with the token included in the headers
+      return axios.post(`${API_URL}/subscriptions`, values, config);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["webhooks"] });
       form.reset();

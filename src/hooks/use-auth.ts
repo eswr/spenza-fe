@@ -4,12 +4,12 @@ import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from '../context/AuthContext';
 import { Credentials, User } from '@/context/types';
 import axios from 'axios';
+import { API_URL } from '@/lib/constants';
 
 interface TokenPayload {
   email: string;
   // Include other properties from your JWT payload if necessary
 }
-const API_URL = import.meta.env.VITE_API_URL;
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
